@@ -18,14 +18,29 @@ public:
   // assignment operator overload, and destructors where appropriate need to use
   // 'const' when appropriate
 
+  // default constructor
+  Menu();
+
+  // non-default constructor
+  Menu(int);
+
+  // destructor
+  ~Menu();
+
   // Suggested functions:
   Coffee search_coffee_by_name(string name);
+
   Menu search_coffee_by_price(float budget);
-  void add_to_menu(Coffee &coffee_to_add); // add a coffee object into the Menu
-  void remove_from_menu(
-      int index_of_coffee_on_menu); // remove a coffee object from the Menu
+
+  // add a coffee object into the Menu
+  void add_to_menu(Coffee &coffee_to_add);
+
+  // remove a coffee object from the Menu
+  void remove_from_menu(int index_of_coffee_on_menu);
 
   // feel free to add more member functions
+
+  void populateMenu();
 };
 
 #endif

@@ -17,13 +17,29 @@ private:
   float revenue;    // shop revenue
   Order *order_arr; // order array
   int num_orders;   // number or orders
+
 public:
   // need to include accessor functions and mutator functions for private member
   // when appropriate need to include constructors and destructors where
   // appropriate need to use 'const' when appropriate
 
+  // default constructor
+  Shop();
+
+  // non default constructor
+  Shop(ifstream &);
+
+  void initArr(int);
+
+  // destructor
+  ~Shop();
+
+  // getters
+
   // Suggested functions
-  void load_data(); // reads from files to correctly populate coffee, menu, etc.
+
+  // reads from files to correctly populate coffee, menu, etc.
+  void load_data(ifstream &);
   void view_shop_detail();
   void add_to_menu();
   void remove_from_menu();

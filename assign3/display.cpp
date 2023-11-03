@@ -30,9 +30,9 @@ int get_choice() {
     cout << "Selection: ";
     cin >> choice;
 
-    if (cin.fail()) {
-      cout << "Invalid Input. Enter a number 1-6 (inclusive)" << endl;
-    }
+    if (!(choice >= 1 && choice <= QUIT))
+      cout << "\nInvalid input. Enter a number 1-8 (inclusive)\n" << endl;
+
   } while (!(choice >= 1 && choice <= QUIT));
 
   return choice;
@@ -59,7 +59,12 @@ void perform_action(Shop &s, int choice) {
     s.place_order();
     break;
   case 7:
-
+    s.clone_shop();
+    break;
+  case QUIT:
+    break;
+  default:
+    cout << "Invalid Integer" << endl;
     break;
   }
 
