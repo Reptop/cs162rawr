@@ -9,8 +9,8 @@ using namespace std;
 
 Menu::Menu() : coffee_arr(nullptr) {}
 
-Menu::Menu(int num_coffee)
-    : num_coffee(num_coffee), coffee_arr(new Coffee[num_coffee]) {}
+// Menu::Menu(int num_coffee)
+//: num_coffee(num_coffee), coffee_arr(new Coffee[num_coffee]) {}
 
 Menu::~Menu() {
   if (coffee_arr != nullptr) {
@@ -19,17 +19,14 @@ Menu::~Menu() {
   }
 }
 
-void Menu::populateMenu() {
-  ifstream inFile;
-  int length;
+void Menu::print_a_coffee(int index) {
+  // does this testing thingy
+  coffee_arr[index].print_coffee();
+}
 
-  inFile.open("menu.txt");
-  inFile >> length;
-
-  Coffee test;
-
-  for (int i = 0; i < length; ++i) {
-  }
+void Menu::allocate_array(int length) {
+  // testing to see if this works
+  coffee_arr = new Coffee[length];
 }
 
 Coffee Menu::search_coffee_by_name(string name) {

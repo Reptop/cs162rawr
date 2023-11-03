@@ -29,8 +29,6 @@ public:
   // non default constructor
   Shop(ifstream &);
 
-  void initArr(int);
-
   // destructor
   ~Shop();
 

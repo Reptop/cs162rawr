@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Coffee::Coffee() : name(NULL), small_cost(0), medium_cost(0), large_cost(0) {}
+Coffee::Coffee() : small_cost(0), medium_cost(0), large_cost(0) {}
 
 Coffee::~Coffee() {}
 
@@ -55,4 +55,5 @@ void Coffee::print_coffee() const {
   cout << "SMALL_COST: " << small_cost << endl;
   cout << "MEDIUM_COST: " << medium_cost << endl;
   cout << "LARGE_COST: " << large_cost << endl;
+  cout << "\n";
 }

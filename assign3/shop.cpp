@@ -10,18 +10,12 @@ using namespace std;
 
 Shop::Shop() : order_arr(nullptr), revenue(0), num_orders(0) {}
 
-Shop::Shop(ifstream &inFile)
-    : m(0), revenue(0), order_arr(nullptr), num_orders(0) {
-  int length;
+Shop::Shop(ifstream &inFile) : order_arr(nullptr), revenue(0), num_orders(0) {
+
   inFile.open("menu.txt");
+  int length;
   inFile >> length;
-
-  // m = Menu(length);
-}
-
-void Shop::initArr(int length) {
-  // testing
-  order_arr = new Order[length];
+  m.allocate_array(length);
 }
 
 Shop::~Shop() {

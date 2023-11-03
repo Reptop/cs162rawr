@@ -1,5 +1,5 @@
 COMPILER=g++
-EXE_FILE=shop_run
+EXE_FILE=run
 
 all: $(EXE_FILE)
 

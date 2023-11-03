@@ -22,7 +22,7 @@ public:
   Menu();
 
   // non-default constructor
-  Menu(int);
+  // Menu(int);
 
   // destructor
   ~Menu();
@@ -40,7 +40,9 @@ public:
 
   // feel free to add more member functions
 
-  void populateMenu();
+  void allocate_array(int);
+
+  void print_a_coffee(int);
 };
 
 #endif
