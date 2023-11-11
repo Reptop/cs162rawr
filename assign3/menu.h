@@ -22,27 +22,41 @@ public:
   Menu();
 
   // non-default constructor
-  // Menu(int);
+  Menu(int);
 
-  // destructor
+  // BIG THREE
+  Menu(const Menu &);
+  Menu &operator=(const Menu &m);
   ~Menu();
 
   // Suggested functions:
-  Coffee search_coffee_by_name(string name);
+  Coffee search_coffee_by_name(string, bool &);
 
-  Menu search_coffee_by_price(float budget);
+  Menu search_coffee_by_price(float, bool &);
 
   // add a coffee object into the Menu
-  void add_to_menu(Coffee &coffee_to_add);
+  void add_to_menu(const Coffee &);
 
   // remove a coffee object from the Menu
-  void remove_from_menu(int index_of_coffee_on_menu);
+  void remove_from_menu(int);
 
   // feel free to add more member functions
 
-  void allocate_array(int);
-
   void print_a_coffee(int);
+
+  void print_all_coffee();
+
+  void load_data(ifstream &);
+
+  int inputScrubbing(string);
+
+  void update_file();
+
+  bool check_duplicates(const Coffee &);
+
+  void filtered_print();
+
+  void print_coffee_names();
 };
 
 #endif

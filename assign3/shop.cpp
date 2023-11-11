@@ -1,21 +1,16 @@
 #include "shop.h"
 #include "coffee.h"
-#include <algorithm>
-#include <cstdint>
 #include <fstream>
+#include <iostream>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 
 // function defintions from shop.h goes here
 
-Shop::Shop() : order_arr(nullptr), revenue(0), num_orders(0) {}
-
-Shop::Shop(ifstream &inFile) : order_arr(nullptr), revenue(0), num_orders(0) {
-
-  inFile.open("menu.txt");
-  int length;
-  inFile >> length;
-  m.allocate_array(length);
+Shop::Shop() : order_arr(nullptr), revenue(0), num_orders(0) {
+  cout << "Created Shop" << endl;
 }
 
 Shop::~Shop() {
@@ -26,96 +21,213 @@ Shop::~Shop() {
   }
 }
 
-void Shop::load_data(ifstream &inFile) {
-  // reads from files to correctly populate coffee, menu, etc.
-  // Your code goes here:
+// Copy constructor
+Shop::Shop(const Shop &existing_shop)
+    : m(existing_shop.m), phone(existing_shop.phone),
+      address(existing_shop.address), revenue(existing_shop.revenue),
+      num_orders(existing_shop.num_orders) {
 
-  inFile.open("shop_info.txt");
+  // Allocate new memory for the order_arr only if there are orders.
+  if (num_orders > 0) {
+    order_arr = new Order[num_orders];
+    for (int i = 0; i < num_orders; ++i) {
+      order_arr[i] =
+          existing_shop
+              .order_arr[i]; // Assuming Order has a working copy constructor.
+    }
+  } else
+    order_arr = nullptr;
+}
 
-  getline(inFile, phone);
-  getline(inFile, address);
+Shop &Shop::operator=(const Shop &existing_shop) {
+  if (this == &existing_shop)
+    return *this;
 
-  inFile.close();
-  inFile.open("menu.txt");
+  // calls the assignment operator overload for the menu
+  m = existing_shop.m;
+  phone = existing_shop.phone;
+  address = existing_shop.address;
+  revenue = existing_shop.revenue;
 
-  int length;
+  if (order_arr != nullptr)
+    delete[] order_arr;
 
-  inFile >> length;
+  num_orders = existing_shop.num_orders;
 
-  string name;
-  float sCost;
-  float mCost;
-  float lCost;
+  if (num_orders > 0) {
+    order_arr = new Order[num_orders];
 
-  for (int i = 0; i < length; ++i) {
-    inFile >> name >> sCost >> mCost >> lCost;
+    for (int i = 0; i < num_orders; ++i)
+      order_arr[i] = existing_shop.order_arr[i];
+
+  } else
+    order_arr = nullptr;
+
+  return *this;
+}
+
+void Shop::load_data(ifstream &shop_info, ifstream &menu_info) {
+  getline(shop_info, phone);
+  getline(shop_info, address);
+
+  m.load_data(menu_info);
+}
+
+void Shop::view_shop_detail() {
+  cout << "\nADDRESS: " << address << endl;
+  cout << "PHONE #: " << phone << endl;
+  cout << "REVENUE: " << revenue << endl;
+
+  cout << "\nMenu: " << endl;
+
+  m.print_all_coffee();
+
+  cout << "Order info: " << endl;
+  if (order_arr == nullptr) {
+    cout << "\nNo orders to display" << endl;
   }
 
   return;
 }
 
-void Shop::view_shop_detail() {
-  // handle "View shop detail" option
-  // print shop address, phone number, revenue, menu, and order
-  // Your code goes here:
-
-  cout << "\nADDRESS: " << address << endl;
-  cout << "PHONE #: " << phone << endl;
-  cout << "REVENUE: " << revenue << endl;
-
-  // inFile.open("menu.txt");
-
-  return;
-}
-
 void Shop::add_to_menu() {
-  // handle "Add coffee to menu" option
-  // Hint: call Menu::add_to_menu(Coffee& coffee_to_add);
-  // Your code goes here:
-  cout << "Shop::add_to_menu() not implemented..." << endl;
+  Coffee newCoffee;
+  string name;
+  float small_cost;
+  float medium_cost;
+  float large_cost;
+
+  cout << "Enter coffee's name: ";
+  getline(cin, name);
+  newCoffee.set_name(name);
+
+  small_cost = newCoffee.get_valid_cost("small");
+  newCoffee.set_small_cost(small_cost);
+
+  medium_cost = newCoffee.get_valid_cost("medium");
+  newCoffee.set_medium_cost(medium_cost);
+
+  large_cost = newCoffee.get_valid_cost("large");
+  newCoffee.set_large_cost(large_cost);
+
+  // check for duplicates first, then add to the array
+  if (m.check_duplicates(newCoffee)) {
+    cout << "\n  Coffee already added\n" << endl;
+    return;
+
+  } else {
+    m.add_to_menu(newCoffee);
+    cout << "\nCoffee Added!\n";
+  }
 
   return;
 }
 
 void Shop::remove_from_menu() {
-  // handle "Remove coffee from menu" option
-  // Hint: call Menu::remove_from_menu(int index_of_coffee_on_menu);
-  // Your code goes here:
-  cout << "Shop::remove_from_menu() not implemented..." << endl;
+  string rawInput;
+  int clean;
+  m.print_all_coffee();
+
+  while (true) {
+    cout << "\nEnter a number to choose a drink: ";
+    cin >> rawInput;
+    clean = m.inputScrubbing(rawInput);
+
+    if (clean == -1) {
+      cout << "\nInvalid input. Enter a number.\n" << endl;
+    } else {
+      m.remove_from_menu(clean - 1);
+      break;
+    }
+  }
+
+  cout << "\nCoffee Removed.\n" << endl;
+
+  // clear buffer
+  cin.clear();
+  cin.ignore(10000, '\n');
 
   return;
 }
 
 void Shop::search_by_name() {
-  // handle "Search by coffee name" option
-  // Hint: call Menu::search_coffee_by_name(string name);
-  // Your code goes here:
-  cout << "Shop::search_by_name() not implemented..." << endl;
+  string name;
+  bool found = false;
+  cout << "Enter coffee name: ";
+  getline(cin, name);
+
+  Coffee results = m.search_coffee_by_name(name, found);
+
+  if (found) {
+    cout << "---------------------------------" << endl;
+
+    cout << "\nResults: " << endl;
+    results.print_coffee();
+
+    cout << "---------------------------------" << endl;
+  } else
+    // prompt user
+    cout << "\nCoffee not found!\n";
 
   return;
 }
 
 void Shop::search_by_price() {
-  // handle "Search by coffee price" option
-  // Hint: call Menu::search_coffee_by_price(float budget);
-  // Your code goes here:
-  cout << "Shop::search_by_price() not implemented..." << endl;
+  bool found = false;
+  string rawBudget;
+  float budget;
+
+  while (true) {
+    cout << "Enter your budget: ";
+    getline(cin, rawBudget);
+    try {
+      budget = stof(rawBudget);
+      if (budget <= 0)
+        throw invalid_argument("Budget must be positive");
+      break;
+    } catch (const invalid_argument &) {
+      cout << "\nInvalid input. Please enter a valid number for your budget.\n"
+           << endl;
+    }
+  }
+
+  Menu temp;
+  // uses assignment operator overload
+  temp = m.search_coffee_by_price(budget, found);
+
+  if (!found) {
+    cout << "\nNo coffee found\n" << endl;
+  }
+
+  else {
+    cout << "Results: " << endl;
+    temp.filtered_print();
+  }
 
   return;
 }
 
 void Shop::place_order() {
-  // handle "Place order" option
-  // Your code goes here:
-  cout << "Shop::place_order() not implemented..." << endl;
+  string rawInput;
+  int input;
+  while (true) {
+    m.print_coffee_names();
+    cout << "\nWhich drinks above would you like to order?" << endl;
+    cout << "Enter a number that corresponds to your choice: ";
+    getline(cin, rawInput);
+
+    input = m.inputScrubbing(rawInput);
+    if (input == -1 || input == 0) {
+      cout << "\nInvalid input. Enter a number.\n" << endl;
+    } else {
+      break;
+    }
+  }
 
   return;
 }
 
 Shop Shop::clone_shop() {
-  // handle "Clone a shop" option
-  // note: the purpose of this option is to test
-  // your big three implementation
   Shop cloned_shop;
 
   cloned_shop = *this; // test AOO

@@ -5,6 +5,11 @@ using namespace std;
 
 Coffee::Coffee() : small_cost(0), medium_cost(0), large_cost(0) {}
 
+Coffee::Coffee(string name, float small_cost, float medium_cost,
+               float large_cost)
+    : name(name), small_cost(small_cost), medium_cost(medium_cost),
+      large_cost(large_cost) {}
+
 Coffee::~Coffee() {}
 
 // getters
@@ -49,11 +54,41 @@ void Coffee::set_large_cost(const float &large_cost) {
   this->large_cost = large_cost;
 }
 
+void Coffee::load_data(ifstream &inFile) {
+  inFile >> name;
+  inFile >> small_cost;
+  inFile >> medium_cost;
+  inFile >> large_cost;
+}
+
+float Coffee::get_valid_cost(const string &size) {
+  string input;
+  float cost;
+
+  while (true) {
+    cout << "Enter coffee's " << size << " cost: ";
+    getline(cin, input);
+    try {
+      cost = stof(input);
+      if (cost <= 0) {
+        throw invalid_argument("Cost must be positive.");
+      }
+
+      // breaks out of the loop
+      return cost;
+
+    } catch (const invalid_argument &) {
+      cout << "\nInvalid input. Please enter a valid number for the cost.\n"
+           << endl;
+    }
+  }
+}
+
 void Coffee::print_coffee() const {
   // print everything
   cout << "NAME: " << name << endl;
-  cout << "SMALL_COST: " << small_cost << endl;
-  cout << "MEDIUM_COST: " << medium_cost << endl;
-  cout << "LARGE_COST: " << large_cost << endl;
+  cout << "SMALL COST: " << small_cost << endl;
+  cout << "MEDIUM COST: " << medium_cost << endl;
+  cout << "LARGE COST: " << large_cost << endl;
   cout << "\n";
 }

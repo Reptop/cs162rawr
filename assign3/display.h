@@ -20,6 +20,8 @@ int get_choice();
  * pre-condition: choice is 1-8
  * post-conditon: an option is performed
  */
-void perform_action(Shop &s, int choice);
+void perform_action(Shop &, int);
+
+int inputScrubbing(string);
 
 #endif

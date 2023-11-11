@@ -27,9 +27,11 @@ public:
   Shop();
 
   // non default constructor
-  Shop(ifstream &);
+  Shop(ifstream &, int &);
 
-  // destructor
+  // BIG THREE
+  Shop(const Shop &);
+  Shop &operator=(const Shop &s);
   ~Shop();
 
   // getters
@@ -37,7 +39,7 @@ public:
   // Suggested functions
 
   // reads from files to correctly populate coffee, menu, etc.
-  void load_data(ifstream &);
+  void load_data(ifstream &, ifstream &);
   void view_shop_detail();
   void add_to_menu();
   void remove_from_menu();

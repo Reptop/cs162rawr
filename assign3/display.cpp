@@ -23,18 +23,30 @@ void print_options() {
   cout << endl;
 }
 
+int inputScrubbing(string n) {
+  if (n == "1" || n == "2" || n == "3" || n == "4" || n == "5" || n == "6" ||
+      n == "7" || n == "8")
+    return n[0] - '0';
+  return -1;
+}
+
 int get_choice() {
+  string rawInput;
   int choice = -1;
-  do {
+
+  while (true) {
     print_options();
-    cout << "Selection: ";
-    cin >> choice;
+    cout << "Enter a number that corresponds to your choice. " << endl;
+    cout << ">> ";
+    getline(cin, rawInput);
+    choice = inputScrubbing(rawInput);
 
-    if (!(choice >= 1 && choice <= QUIT))
-      cout << "\nInvalid input. Enter a number 1-8 (inclusive)\n" << endl;
-
-  } while (!(choice >= 1 && choice <= QUIT));
-
+    if (choice == -1) {
+      cout << "\nInvalid Input! Enter a number 1-8 (inclusive)\n" << endl;
+    } else {
+      break;
+    }
+  }
   return choice;
 }
 
@@ -62,9 +74,6 @@ void perform_action(Shop &s, int choice) {
     s.clone_shop();
     break;
   case QUIT:
-    break;
-  default:
-    cout << "Invalid Integer" << endl;
     break;
   }
 
