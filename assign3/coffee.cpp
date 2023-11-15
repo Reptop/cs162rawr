@@ -1,3 +1,12 @@
+/*********************************************************************
+** Program Filename: coffee.cpp
+** Author: Raed Kabir
+** Date: 11/12/2023
+** Description: This file consists of all function defintions for coffee.h
+** Input: N/A
+** Output: N/A
+*********************************************************************/
+
 #include "coffee.h"
 #include <iostream>
 

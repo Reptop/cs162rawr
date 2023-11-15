@@ -3,7 +3,7 @@
 
 #include "shop.h"
 
-#define QUIT 8
+#define QUIT 9
 
 /* name: get_choice()
  * description: get an user input for option
@@ -22,6 +22,12 @@ int get_choice();
  */
 void perform_action(Shop &, int);
 
+/* name: input_scrubbing()
+ * description: checks for types errors
+ * parameters: 	string input
+ * pre-condition: choice is 1-8
+ * post-conditon: user is prompted to enter again if invalid type
+ */
 int inputScrubbing(string);
 
 #endif

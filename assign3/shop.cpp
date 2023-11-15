@@ -1,7 +1,17 @@
+/*********************************************************************
+** Program Filename: shop.cpp
+** Author: Raed Kabir
+** Date: 11/12/2023
+** Description: This file consists of all function defintions for shop.h
+** Input: N/A
+** Output: N/A
+*********************************************************************/
+
 #include "shop.h"
 #include "coffee.h"
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <stdexcept>
 #include <string>
 
@@ -83,8 +93,15 @@ void Shop::view_shop_detail() {
   m.print_all_coffee();
 
   cout << "Order info: " << endl;
-  if (order_arr == nullptr) {
+  if (order_arr == nullptr)
     cout << "\nNo orders to display" << endl;
+
+  else {
+    for (int i = 0; i < num_orders; ++i) {
+      cout << order_arr[i].get_id() << " " << order_arr[i].get_coffee_name()
+           << " " << order_arr[i].get_coffee_size() << " "
+           << order_arr[i].get_quantity() << endl;
+    }
   }
 
   return;
@@ -210,6 +227,10 @@ void Shop::search_by_price() {
 void Shop::place_order() {
   string rawInput;
   int input;
+  char size;
+  int quantity;
+  float revenue;
+
   while (true) {
     m.print_coffee_names();
     cout << "\nWhich drinks above would you like to order?" << endl;
@@ -217,14 +238,192 @@ void Shop::place_order() {
     getline(cin, rawInput);
 
     input = m.inputScrubbing(rawInput);
-    if (input == -1 || input == 0) {
+    if (input == -1 || input == 0)
       cout << "\nInvalid input. Enter a number.\n" << endl;
-    } else {
+    else
       break;
+  }
+
+  process_order(input, size, quantity, revenue);
+
+  cout << "\nPlaced Order!\n" << endl;
+  return;
+}
+
+void Shop::process_order(int &input, char &size, int &quantity,
+                         float &revenue) {
+  string name;
+  Order newOrder;
+
+  cout << '\n';
+  m.print_a_coffee(input - 1);
+  name = m.get_name_from_index(input - 1);
+  size = process_size();
+  quantity = process_quantity();
+  revenue = m.process_cost(input - 1, size, quantity);
+
+  this->revenue += revenue;
+
+  newOrder.set_id(num_orders + 1);
+  newOrder.set_quantity(quantity);
+  newOrder.set_coffee_name(name);
+  newOrder.set_coffee_size(size);
+
+  add_to_order_arr(newOrder);
+}
+
+void Shop::add_to_order_arr(const Order &newOrder) {
+
+  Order *new_array = new Order[num_orders + 1];
+  for (int i = 0; i < num_orders; ++i) {
+    new_array[i] = order_arr[i];
+  }
+
+  // deletes old array
+  delete[] order_arr;
+
+  // points to new array
+  order_arr = new_array;
+
+  ++num_orders;
+  order_arr[num_orders - 1] = newOrder;
+
+  update_order_file();
+
+  return;
+}
+
+void Shop::update_order_file() {
+  ofstream outFile("orders.txt");
+
+  if (outFile.fail()) {
+    cout << "\nCould not open order.txt file!\n" << endl;
+    return;
+  }
+
+  for (int i = 0; i < num_orders; ++i) {
+    outFile << order_arr[i].get_id() << " " << order_arr[i].get_coffee_name()
+            << " " << order_arr[i].get_coffee_size() << " "
+            << order_arr[i].get_quantity() << endl;
+  }
+}
+
+int Shop::process_quantity() {
+  string input;
+  int quantity;
+
+  while (true) {
+    cout << "\nEnter quantity: ";
+    getline(cin, input);
+    try {
+      quantity = stoi(input);
+      if (quantity <= 0)
+        throw invalid_argument("Cost must be positive.");
+
+      // breaks out of the loop
+      return quantity;
+
+    } catch (const invalid_argument &) {
+      cout << "\nInvalid input. Please enter a valid number for the quantity.\n"
+           << endl;
+    }
+  }
+}
+
+char Shop::process_size() {
+  char size;
+
+  while (true) {
+    cout << "\nEnter the size: s-small, m-medium, l-large: ";
+    cin >> size;
+
+    if (size == 's' || size == 'm' || size == 'l')
+      break;
+    else {
+      cout << "\nInvalid input. Enter s(small), m(medium), or l(large)" << endl;
+      cin.clear();
+      cin.ignore(10000, '\n');
     }
   }
 
-  return;
+  cin.clear();
+  cin.ignore(10000, '\n');
+  return size;
+}
+
+void Shop::stats() {
+  int input = 0;
+
+  if (order_arr == nullptr) {
+    cout << "\nOrder array is empty! Cannot view stats.\n" << endl;
+    return;
+  }
+
+  while (true) {
+    string name = "Drink does not exist";
+
+    cout << "Which statistics would you like to see?\n" << endl;
+    cout << "1. Best seller of a specific size." << endl;
+    cout << "2. Drink that makes the most revenue of all sizes combined."
+         << endl;
+    cout << "3. Return to command menu" << endl;
+
+    cout << '\n';
+    cout << "Enter a number that corresponds to your choice: ";
+    cin >> input;
+
+    if (input == 3) {
+      cin.ignore(100000, '\n');
+      cin.clear();
+      break;
+    }
+
+    switch (input) {
+    case 1:
+      best_seller_size();
+      break;
+
+    case 2:
+      // stuff
+      break;
+
+    default:
+      cout << "\nInvalid input. Enter 1 or 2\n" << endl;
+      cin.clear();
+      cin.ignore(100000, '\n');
+      break;
+    }
+  }
+}
+
+void Shop::best_seller_size() {
+  char n;
+  cout << "Which size would you like to check?" << endl;
+  cout << "Enter size (s/m/l): ";
+  cin >> n;
+
+  if (n != 's' && n != 'm' && n != 'l') {
+    cout << "Invalid input! Enter a valid size" << endl;
+    return;
+  }
+
+  string name;
+  int maxQuantity = 0;
+
+  for (int i = 0; i < num_orders; ++i) {
+    if (order_arr[i].get_coffee_size() == n) {
+      int quantity = order_arr[i].get_quantity();
+      if (quantity > maxQuantity) {
+        maxQuantity = quantity;
+        name = order_arr[i].get_coffee_name();
+      }
+    }
+  }
+
+  if (maxQuantity > 0)
+    cout << "\nBest seller of " << n << " size is: " << name << endl;
+  else
+    cout << "\nNo orders found for size " << n << endl;
 }
 
 Shop Shop::clone_shop() {

@@ -1,15 +1,19 @@
+/*********************************************************************
+** Program Filename: order.cpp
+** Author: Raed Kabir
+** Date: 11/12/2023
+** Description: This file consists of all function defintions for order.h
+** Input: N/A
+** Output: N/A
+*********************************************************************/
 #include "order.h"
 
-using namespace std;
-
-// function defintions from order.h goes here
-
 Order::Order() {
-  // something
+  // empty
 }
 
 Order::~Order() {
-  // something
+  // empty - not needed
 }
 
 int Order::get_id() const {

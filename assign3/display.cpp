@@ -19,13 +19,14 @@ void print_options() {
   cout << "  5. Search by price " << endl;
   cout << "  6. Place an order " << endl;
   cout << "  7. Clone a shop " << endl;
-  cout << "  8. Log out " << endl;
+  cout << "  8. View additional statistics " << endl;
+  cout << "  9. Log out " << endl;
   cout << endl;
 }
 
 int inputScrubbing(string n) {
   if (n == "1" || n == "2" || n == "3" || n == "4" || n == "5" || n == "6" ||
-      n == "7" || n == "8")
+      n == "7" || n == "8" || n == "9")
     return n[0] - '0';
   return -1;
 }
@@ -73,6 +74,8 @@ void perform_action(Shop &s, int choice) {
   case 7:
     s.clone_shop();
     break;
+  case 8:
+    s.stats();
   case QUIT:
     break;
   }

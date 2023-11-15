@@ -1,3 +1,12 @@
+/*********************************************************************
+** Program Filename: menu.cpp
+** Author: Raed Kabir
+** Date: 11/12/2023
+** Description: This file consists of all function defintions for menu.h
+** Input: N/A
+** Output: N/A
+*********************************************************************/
+
 #include "menu.h"
 #include "coffee.h"
 #include <fstream>
@@ -26,16 +35,14 @@ Menu &Menu::operator=(const Menu &existing_menu) {
   cout << "Used assignment operator overload" << endl;
 
   // check if existing_menu is the same
-  if (this == &existing_menu) {
+  if (this == &existing_menu)
     return *this;
-  }
 
   // allocate new resources first
   Coffee *new_coffee_arr = new Coffee[existing_menu.num_coffee];
 
-  for (int i = 0; i < existing_menu.num_coffee; ++i) {
+  for (int i = 0; i < existing_menu.num_coffee; ++i)
     new_coffee_arr[i] = existing_menu.coffee_arr[i];
-  }
 
   // delete old resources
   delete[] coffee_arr;
@@ -89,9 +96,7 @@ void Menu::print_coffee_names() {
 }
 
 int Menu::inputScrubbing(string n) {
-  if (n.length() > 1)
-    return -1;
-  if (n >= "0" && n <= to_string(num_coffee))
+  if (n > "0" && n <= to_string(num_coffee))
     return n[0] - '0';
   return -1;
 }
@@ -185,20 +190,45 @@ void Menu::add_to_menu(const Coffee &coffee_to_add) {
   return;
 }
 
+string Menu::get_name_from_index(int index) {
+  string name;
+
+  name = coffee_arr[index].get_name();
+
+  return name;
+}
+
 void Menu::filtered_print() {
   for (int i = 0; i < num_coffee; ++i) {
     cout << "NAME: " << coffee_arr[i].get_name() << endl;
-    if (coffee_arr[i].get_small_cost() != 0) {
+    if (coffee_arr[i].get_small_cost() != 0)
       cout << "SMALL COST: " << coffee_arr[i].get_small_cost() << endl;
-    }
-    if (coffee_arr[i].get_medium_cost() != 0) {
+    if (coffee_arr[i].get_medium_cost() != 0)
       cout << "MEDIUM COST: " << coffee_arr[i].get_medium_cost() << endl;
-    }
-    if (coffee_arr[i].get_large_cost() != 0) {
+
+    if (coffee_arr[i].get_large_cost() != 0)
       cout << "LARGE COST: " << coffee_arr[i].get_large_cost() << endl;
-    }
     cout << "\n";
   }
+}
+
+float Menu::process_cost(int index, char size, int quantity) {
+  float cost;
+  switch (size) {
+  case 's':
+    cost = coffee_arr[index].get_small_cost();
+    cost = cost * quantity;
+    break;
+  case 'm':
+    cost = coffee_arr[index].get_medium_cost();
+    cost = cost * quantity;
+    break;
+  case 'l':
+    cost = coffee_arr[index].get_large_cost();
+    cost = cost * quantity;
+    break;
+  }
+  return cost;
 }
 
 void Menu::remove_from_menu(int index_of_coffee_on_menu) {
