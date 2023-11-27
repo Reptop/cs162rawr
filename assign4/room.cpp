@@ -22,9 +22,10 @@ Event *Room::getEvent() const {
   return event;
 }
 
-void Room::setPlayerPresence(bool presence) const {
+void Room::setPlayerPresence(bool presence) {
   // set player presence
-  presence = hasPlayer;
+
+  hasPlayer = presence;
 }
 
 string Room::getEventType() const {

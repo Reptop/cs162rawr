@@ -22,7 +22,7 @@ public:
 
   void setEvent(Event *);
   Event *getEvent() const;
-  void setPlayerPresence(bool) const;
+  void setPlayerPresence(bool);
   string getEventType() const;
   bool hasEvent() const;
   bool hasAdventurer() const;

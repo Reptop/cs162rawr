@@ -3,6 +3,7 @@
 
 #include "bats.h"
 #include "gold.h"
+#include "player.h"
 #include "room.h"
 #include "stalactites.h"
 #include "wumpus.h"
@@ -21,8 +22,10 @@ struct Coordinate {
 // Game interface
 class Game {
 private:
-  // declare a 2D vector of Room objects:
+  // declare a 2D vector of Room objects
   vector<vector<Room>> board;
+
+  Player p;
 
   // other member variables:
   int length;      // length of the board
@@ -41,7 +44,7 @@ public:
 
   void display_game() const;
 
-  bool check_win() const;
+  bool check_win(const Player &) const;
 
   char get_dir();
   void wumpus_move();
@@ -67,6 +70,8 @@ public:
                     Stalactite *&, Bat *&, Bat *&);
 
   void manualShuffle(vector<pair<int, int>> &array);
+
+  void setInitialPos(vector<vector<Room>> &);
 
   void placeEventsRandomly(vector<vector<Room>> &grid,
                            vector<Event *> &eventList);

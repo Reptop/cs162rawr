@@ -3,8 +3,8 @@ EXE_FILE=asm4
 
 all: $(EXE_FILE)
 
-$(EXE_FILE): bats.o event.o game.o gold.o room.o stalactites.o wumpus.o main.cpp
-	$(COMPILER) bats.o event.o game.o gold.o room.o stalactites.o wumpus.o main.cpp -lcurses -o $(EXE_FILE)
+$(EXE_FILE): bats.o event.o game.o gold.o room.o stalactites.o wumpus.o player.o main.cpp
+	$(COMPILER) bats.o event.o game.o gold.o room.o stalactites.o wumpus.o player.o main.cpp -lcurses -o $(EXE_FILE)
 
 bats.o: bats.h bats.cpp
 	$(COMPILER) -c bats.cpp
@@ -26,6 +26,9 @@ stalactites.o: stalactites.h stalactites.cpp
 
 wumpus.o: wumpus.h wumpus.cpp
 	$(COMPILER) -c wumpus.cpp
+
+player.o: player.h player.cpp
+	$(COMPILER) -c player.cpp
 
 clean:
 	rm -f *.o $(EXE_FILE)

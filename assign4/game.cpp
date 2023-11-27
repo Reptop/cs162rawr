@@ -171,8 +171,12 @@ void Game::display_game() const {
         string eventType = board[i][j].getEventType();
         cout << eventType;
         cout << " ||";
-      } else
+      } else if (board[i][j].hasAdventurer() == true) {
+        cout << "*";
+        cout << " ||";
+      } else {
         cout << "  ||";
+      }
 
       cout << " ";
     }
@@ -181,11 +185,37 @@ void Game::display_game() const {
   cout << line << endl;
 }
 
-bool Game::check_win() const {
+void Game::setInitialPos(vector<vector<Room>> &roomList) {
+  for (int i = 0; i < length; ++i) {
+    for (int j = 0; j < width; ++j) {
+      if (!roomList[i][j].hasEvent()) {
+        p.initialX = i;
+        p.initialY = j;
+
+        p.currentX = i;
+        p.currentY = j;
+        roomList[i][j].setPlayerPresence(true);
+        break;
+      }
+    }
+    break;
+  }
+}
+
+bool Game::check_win(const Player &p) const {
   // check if game over/win
   // Your code here:
 
-  cout << "Game::check_win() is not implemented..." << endl;
+  if (p.isAlive && !p.hasGold)
+    return false;
+
+  else if (!p.isAlive)
+    return false;
+
+  else if (p.isAlive && p.hasGold && p.currentX == p.initialX &&
+           p.currentY == p.initialY)
+    return true;
+
   return false;
 }
 
@@ -194,6 +224,8 @@ void Game::move_up() {
   // Your code here:
 
   cout << "Game::move_up() is not implemented..." << endl;
+
+  board[p.currentX][p.currentY];
   return;
 }
 
@@ -270,16 +302,16 @@ void Game::move(int c) {
 
   switch (c) {
   case 'w':
-    Game::move_up();
+    move_up();
     break;
   case 'a':
-    Game::move_left();
+    move_left();
     break;
   case 's':
-    Game::move_down();
+    move_down();
     break;
   case 'd':
-    Game::move_right();
+    move_right();
     break;
   }
 }
@@ -307,24 +339,41 @@ char Game::get_input() {
 
 // Note: you need to modify this function
 void Game::play_game(int w, int l, bool d) {
-  Game::set_up(w, l);
+  set_up(w, l);
   this->debug_view = d;
+
+  cout << "Before: " << endl;
+  cout << p.currentX << endl;
+  cout << p.currentY << endl;
+
+  setInitialPos(board);
+
+  cout << "After: " << endl;
+  cout << p.currentX << endl;
+  cout << p.currentY << endl;
+
+  for (int i = 0; i < length; ++i) {
+    for (int j = 0; j < width; ++j) {
+      cout << board[i][j].hasAdventurer() << " ";
+    }
+    cout << endl;
+  }
 
   char input, arrow_input;
 
-  while (Game::check_win() == false) {
+  while (!check_win(p)) {
     // print game board
-    Game::display_game();
+    display_game();
 
     // display percerts around player's location
     // Your code here:
 
     // Player move...
     // 1. get input
-    input = Game::get_input();
+    input = get_input();
 
     // 2. move player
-    Game::move(input);
+    move(input);
 
     // 3. may or may not encounter events
     // Your code here:
