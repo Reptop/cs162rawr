@@ -13,12 +13,6 @@
 
 using namespace std;
 
-struct Coordinate {
-  int x, y;
-
-  Coordinate(int x, int y) : x(x), y(y) {}
-};
-
 // Game interface
 class Game {
 private:
@@ -48,7 +42,7 @@ public:
 
   char get_dir();
   void wumpus_move();
-  void fire_arrow();
+  void fire_arrow(int, int);
 
   void move_up();
   void move_down();
@@ -69,11 +63,28 @@ public:
   void assignEvents(vector<vector<Room>> &, Gold *&, Wumpus *&, Stalactite *&,
                     Stalactite *&, Bat *&, Bat *&);
 
-  void manualShuffle(vector<pair<int, int>> &array);
+  void manualShuffle(vector<pair<int, int>> &);
 
   void setInitialPos(vector<vector<Room>> &);
 
-  void placeEventsRandomly(vector<vector<Room>> &grid,
-                           vector<Event *> &eventList);
+  void placeEventsRandomly(vector<vector<Room>> &, vector<Event *> &);
+
+  void checkPercepts(const vector<vector<Room>> &);
+
+  void fire_north(int &, int &, const vector<vector<Room>> &);
+
+  void fire_west(int &, int &, const vector<vector<Room>> &);
+
+  void fire_east(int &, int &, const vector<vector<Room>> &);
+
+  void fire_south(int &, int &, const vector<vector<Room>> &);
+
+  pair<int, int> giveRandomCoords();
+
+  void repositionWumpus();
+
+  void inverted_move(int c);
+
+  void movement(const int &);
 };
 #endif

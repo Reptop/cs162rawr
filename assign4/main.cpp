@@ -28,11 +28,11 @@ int main() {
   // get two inputs: size of the cave(wid and len)
   g.setValidWid(rawWid, wid);
   g.setValidLen(rawLen, len);
-  g.setMode(debug);
 
   // get the 3rd input --> debug mode or not
+  g.setMode(debug);
 
-  // Play game
+  // play game
   g.play_game(wid, len, debug);
 
   endwin();

@@ -1,6 +1,7 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include "player.h"
 #include <iostream>
 using namespace std;
 
@@ -13,10 +14,10 @@ protected:
   string type;
 
 public:
-  Event() = default;
+  Event();
   Event(const string);
   virtual void performAction() = 0;
-  virtual void encounter() = 0;
+  virtual void encounter(Player &) = 0;
   virtual void percept() = 0;
 
   // event identifier

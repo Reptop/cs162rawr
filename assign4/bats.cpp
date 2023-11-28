@@ -1,4 +1,5 @@
 #include "bats.h"
+#include "player.h"
 
 #include <iostream>
 
@@ -13,10 +14,20 @@ Bat::~Bat() {
 }
 
 void Bat::percept() {
-  // testing
-  cout << "Test" << endl;
+  // percept
+  cout << "\nYou hear wings flapping...\n" << endl;
 }
-void Bat::encounter() { cout << "Bat Encounter Testing" << endl; }
+
+void Bat::encounter(Player &p) {
+  // encounter
+  cout << "\n----------------------------------" << endl;
+  cout << "You encountered SUPER BATS!" << endl;
+  cout << "The bats used confuse ray on you..." << endl;
+  cout << "Your movement is now INVERTED for the next 5 moves..." << endl;
+  cout << "----------------------------------" << endl;
+
+  p.isConfused = true;
+}
 
 void Bat::performAction() {
   // test

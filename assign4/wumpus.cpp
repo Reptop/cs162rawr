@@ -1,4 +1,5 @@
 #include "wumpus.h"
+#include "player.h"
 
 #include <iostream>
 
@@ -13,12 +14,17 @@ Wumpus::~Wumpus() {
 }
 
 void Wumpus::percept() {
-  // testing
-  cout << "Test" << endl;
+  // percept
+  cout << "\nYou smell a terrible stench...\n" << endl;
 }
-void Wumpus::encounter() {
+void Wumpus::encounter(Player &p) {
   // testing
-  cout << "Wumpus Encounter Testing" << endl;
+  cout << "----------------------------------" << endl;
+  cout << "\nYou encounter the Wumpus...\n" << endl;
+  cout << "You have made a grave mistake..." << endl;
+  cout << "         YOU ARE DEAD" << endl;
+  p.isAlive = false;
+  cout << "----------------------------------" << endl;
 }
 
 void Wumpus::performAction() {
