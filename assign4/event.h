@@ -11,7 +11,7 @@ using namespace std;
 class Event {
 
 protected:
-  string type;
+  string type = " ";
 
 public:
   Event();
@@ -23,6 +23,8 @@ public:
   // event identifier
   virtual string getType() = 0;
   virtual void setType(const string) = 0;
+
+  virtual bool playAgain(Player &p);
 
   virtual ~Event();
 };

@@ -11,8 +11,11 @@ public:
   bool isAlive;
   bool hasGold;
   bool killedWumpus;
+  bool hasArmor;
 
   int invertedCounter;
+  int turnCount;
+  int armorHealth;
 
   int initialX;
   int initialY;

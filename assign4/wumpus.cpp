@@ -19,12 +19,25 @@ void Wumpus::percept() {
 }
 void Wumpus::encounter(Player &p) {
   // testing
+  cout << "\n----------------------------------" << endl;
+  cout << "You encounter the Wumpus..." << endl;
+  cout << "          Uh oh..." << endl;
   cout << "----------------------------------" << endl;
-  cout << "\nYou encounter the Wumpus...\n" << endl;
-  cout << "You have made a grave mistake..." << endl;
-  cout << "         YOU ARE DEAD" << endl;
-  p.isAlive = false;
-  cout << "----------------------------------" << endl;
+
+  if (p.armorHealth > 0 && p.hasArmor) {
+    --p.armorHealth;
+
+    cout << "\n----------------------------------" << endl;
+    cout << "WAIT, Your shiny armor saved you!" << endl;
+    cout << "----------------------------------" << endl;
+
+  } else if (p.armorHealth == 0 || !p.hasArmor) {
+    cout << "\n----------------------------------" << endl;
+    cout << " You have made a grave mistake..." << endl;
+    cout << "         YOU ARE DEAD" << endl;
+    cout << "----------------------------------" << endl;
+    p.isAlive = false;
+  }
 }
 
 void Wumpus::performAction() {

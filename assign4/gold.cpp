@@ -17,11 +17,14 @@ void Gold::percept() {
   // testing
   cout << "\nYou see a glimmer nearby...\n" << endl;
 }
+
 void Gold::encounter(Player &p) {
   cout << "\n---------------------------------" << endl;
   cout << "You found the Wumpus' Gold!" << endl;
   cout << "You picked up the Gold" << endl;
+  cout << "Quick! Return to the escape rope to win!!" << endl;
   cout << "---------------------------------" << endl;
+  p.hasGold = true;
 }
 
 void Gold::performAction() {

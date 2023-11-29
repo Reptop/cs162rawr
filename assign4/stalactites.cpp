@@ -26,17 +26,30 @@ bool Stalactite::success() {
 }
 
 void Stalactite::encounter(Player &p) {
-  cout << "----------------------------------" << endl;
-  cout << "\nYou encounter a stalactite...\n" << endl;
+  cout << "\n----------------------------------" << endl;
+  cout << "You encounter a stalactite...\n" << endl;
   cout << "The stalactite suddenly falls directly from above!" << endl;
-  if (success())
-    cout << "Luckily, you managed to dodge the stalactite safely!" << endl;
-  else {
-    cout << "You fail to dodge the stalactite..." << endl;
-    cout << "         YOU ARE DEAD" << endl;
-    p.isAlive = false;
-  }
   cout << "----------------------------------" << endl;
+
+  if (success()) {
+    cout << "\n----------------------------------" << endl;
+    cout << "Luckily, you managed to dodge the stalactite safely!" << endl;
+    cout << "----------------------------------" << endl;
+  } else {
+
+    if (p.armorHealth > 0 && p.hasArmor) {
+      --p.armorHealth;
+
+      cout << "\n----------------------------------" << endl;
+      cout << "Luckily, Your shiny armor saved you!" << endl;
+      cout << "----------------------------------" << endl;
+
+    } else if (p.armorHealth == 0 || !p.hasArmor) {
+      cout << "You fail to dodge the stalactite..." << endl;
+      cout << "         YOU ARE DEAD" << endl;
+      p.isAlive = false;
+    }
+  }
 }
 
 void Stalactite::performAction() {

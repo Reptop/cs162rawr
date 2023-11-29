@@ -4,7 +4,9 @@ using namespace std;
 
 // Room Implementation
 
-Room::Room() : event(nullptr), hasPlayer(false) {}
+Room::Room() : event(nullptr), hasPlayer(false) {
+  cout << "Created a Room" << endl;
+}
 
 Room::~Room() {
   // delete just in case

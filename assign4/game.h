@@ -1,12 +1,14 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "armor.h"
 #include "bats.h"
 #include "gold.h"
 #include "player.h"
 #include "room.h"
 #include "stalactites.h"
 #include "wumpus.h"
+
 #include <iostream>
 #include <ncurses.h>
 #include <vector>
@@ -61,7 +63,7 @@ public:
   void setMode(bool &);
 
   void assignEvents(vector<vector<Room>> &, Gold *&, Wumpus *&, Stalactite *&,
-                    Stalactite *&, Bat *&, Bat *&);
+                    Stalactite *&, Bat *&, Bat *&, Armor *&);
 
   void manualShuffle(vector<pair<int, int>> &);
 
@@ -83,8 +85,10 @@ public:
 
   void repositionWumpus();
 
-  void inverted_move(int c);
+  void inverted_move(int);
 
   void movement(const int &);
+
+  void blockRandom();
 };
 #endif

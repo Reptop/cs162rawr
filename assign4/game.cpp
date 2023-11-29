@@ -1,4 +1,6 @@
 #include "game.h"
+#include "armor.h"
+#include "hidden.h"
 #include "player.h"
 #include "wumpus.h"
 
@@ -100,13 +102,15 @@ void Game::placeEventsRandomly(vector<vector<Room>> &grid,
   int numCols = grid[0].size();
 
   vector<pair<int, int>> cellIndices;
+
   for (int i = 0; i < numRows; ++i) {
-    for (int j = 0; j < numCols; ++j) {
+    for (int j = 0; j < numCols; ++j)
+
+      // emplace back to directly insert object - more efficient
       cellIndices.emplace_back(i, j);
-    }
   }
 
-  // shuffle using the manually implemented Fisher-Yates algorithm
+  // shuffle using the manually implemented fisher-Yates algorithm
   manualShuffle(cellIndices);
 
   for (int i = 0; i < eventList.size(); ++i) {
@@ -118,7 +122,8 @@ void Game::placeEventsRandomly(vector<vector<Room>> &grid,
 
 void Game::assignEvents(vector<vector<Room>> &grid, Gold *&gold,
                         Wumpus *&wumpus, Stalactite *&stalactite1,
-                        Stalactite *&stalactite2, Bat *&bat1, Bat *&bat2) {
+                        Stalactite *&stalactite2, Bat *&bat1, Bat *&bat2,
+                        Armor *&armor) {
 
   // Create event pointers to avoid object slicing when upcasting
   // Also store on heap so it doesnt get deleted when out of scope
@@ -128,84 +133,94 @@ void Game::assignEvents(vector<vector<Room>> &grid, Gold *&gold,
   stalactite2 = new Stalactite;
   bat1 = new Bat;
   bat2 = new Bat;
+  armor = new Armor;
 
   vector<Event *> eventList;
-  eventList.assign({gold, wumpus, stalactite1, stalactite2, bat1, bat2});
+  eventList.assign({gold, wumpus, stalactite1, stalactite2, bat1, bat2, armor});
 
   placeEventsRandomly(grid, eventList);
 }
 
 void Game::set_up(int l, int w) {
   // set up
-  this->length = l;
-  this->width = w;
+  length = l;
+  width = w;
 
   // start with 3 arrows
-  this->num_arrows = 3;
+  num_arrows = 3;
 
   Gold *gold;
   Wumpus *wumpus;
   Stalactite *stalactite1, *stalactite2;
   Bat *bat1, *bat2;
+  Armor *armor;
 
   // create the game board: 2D vector of Room objects
-  board.resize(this->length);
+  board.resize(length);
 
   // resize each inner vector to have 'numCols' columns
-  for (int i = 0; i < this->length; ++i)
-    board[i].resize(this->width);
+  for (int i = 0; i < length; ++i)
+    board[i].resize(width);
 
   // assign all events randomly
-  assignEvents(board, gold, wumpus, stalactite1, stalactite2, bat1, bat2);
+  assignEvents(board, gold, wumpus, stalactite1, stalactite2, bat1, bat2,
+               armor);
 }
 
 void Game::display_game() const {
-  cout << endl << "Arrows remaining: " << this->num_arrows << endl;
+  cout << endl << "Arrows remaining: " << num_arrows << endl;
 
-  // Function to draw horizontal line
+  // function to draw horizontal line
   auto drawLine = [this]() {
-    for (int i = 0; i < this->width; ++i)
+    for (int i = 0; i < width; ++i)
       cout << "-----";
     cout << endl;
   };
 
-  // Draw top line
+  // draw top line
   drawLine();
 
-  for (int i = 0; i < this->length; ++i) {
-    for (int j = 0; j < this->width; ++j) {
-      cout << "|| "; // Start each cell with a border
+  for (int i = 0; i < length; ++i) {
+    for (int j = 0; j < width; ++j) {
+      cout << "|| ";
 
-      if (board[i][j].hasAdventurer())
+      if (i == p.initialX && j == p.initialY && board[i][j].hasAdventurer() &&
+          debug_view)
+        cout << "E*";
+
+      else if (i == p.initialX && j == p.initialY && debug_view)
+        cout << "E";
+
+      else if (board[i][j].hasEvent() && board[i][j].getEventType() == "G" &&
+               p.hasGold)
+        cout << " ";
+
+      else if (board[i][j].hasAdventurer())
         cout << "*";
-      else if (board[i][j].hasEvent() && debug_view)
-        cout << board[i][j].getEventType(); // Show event type in debug view
-      else
-        cout << " "; // Empty space
 
-      cout << " "; // End each cell with a space
+      else if (board[i][j].hasEvent() && debug_view)
+        cout << board[i][j].getEventType();
+
+      else
+        cout << " ";
+
+      cout << " ";
     }
-    cout << "||" << endl; // End each row with a border
-    drawLine();           // Draw line after each row
+    cout << "||" << endl;
+    drawLine();
   }
 }
 
 void Game::setInitialPos(vector<vector<Room>> &roomList) {
-  for (int i = 0; i < length; ++i) {
-    for (int j = 0; j < width; ++j) {
+  pair<int, int> randomCoord = giveRandomCoords();
 
-      if (!roomList[i][j].hasEvent()) {
-        p.initialX = i;
-        p.initialY = j;
+  p.initialX = randomCoord.first;
+  p.initialY = randomCoord.second;
 
-        p.currentX = i;
-        p.currentY = j;
-        roomList[i][j].setPlayerPresence(true);
-        break;
-      }
-    }
-    break;
-  }
+  p.currentX = randomCoord.first;
+  p.currentY = randomCoord.second;
+
+  roomList[p.initialX][p.initialY].setPlayerPresence(true);
 }
 
 bool Game::check_win(const Player &p) const {
@@ -214,8 +229,13 @@ bool Game::check_win(const Player &p) const {
     return true;
 
   else if (p.isAlive && p.hasGold && p.currentX == p.initialX &&
-           p.currentY == p.initialY)
+           p.currentY == p.initialY) {
+    cout << "\n------------------------------------------" << endl;
+    cout << "          YOU ESCAPED WITH THE GOLD!      " << endl;
+    cout << "             CONGRATS PLAYER!              " << endl;
+    cout << "------------------------------------------" << endl;
     return true;
+  }
 
   else if (p.killedWumpus == true)
     return true;
@@ -224,59 +244,94 @@ bool Game::check_win(const Player &p) const {
 }
 
 void Game::move_up() {
-  // Clear the player's current position
+  int newX = p.currentX - 1 < 0 ? length - 1 : p.currentX - 1;
+
+  // Check for event at the new position
+  if (board[newX][p.currentY].hasEvent() &&
+      board[newX][p.currentY].getEventType() == "H") {
+    cout << "\n------------------------------------------" << endl;
+    cout << "     You tried to enter a blocked room..." << endl;
+    cout << "             That's too bad :(" << endl;
+    cout << "------------------------------------------" << endl;
+    return;
+  }
+
+  // clear the player's current position
   board[p.currentX][p.currentY].setPlayerPresence(false);
 
-  // move player up, wrapping around if necessary
-  if (p.currentX - 1 < 0)
-    p.currentX = length - 1;
-  else
-    --p.currentX;
+  // Update the player's position
+  p.currentX = newX;
 
   // Set the player's new position
   board[p.currentX][p.currentY].setPlayerPresence(true);
 }
 
 void Game::move_down() {
+  int newX = p.currentX + 1 == length ? 0 : p.currentX + 1;
+
+  // Check for event at the new position
+  if (board[newX][p.currentY].hasEvent() &&
+      board[newX][p.currentY].getEventType() == "H") {
+    cout << "\n------------------------------------------" << endl;
+    cout << "     You tried to enter a blocked room..." << endl;
+    cout << "             That's too bad :(" << endl;
+    cout << "------------------------------------------" << endl;
+    return;
+  }
+
   // Clear the player's current position
   board[p.currentX][p.currentY].setPlayerPresence(false);
 
-  // Move player down, wrapping around if necessary
-  if (p.currentX + 1 == length) {
-    p.currentX = 0;
-  } else {
-    ++p.currentX;
-  }
+  // Update the player's position
+  p.currentX = newX;
 
   // Set the player's new position
   board[p.currentX][p.currentY].setPlayerPresence(true);
 }
 
 void Game::move_left() {
-  // Clear current position
+  int newY = p.currentY - 1 < 0 ? length - 1 : p.currentY - 1;
+
+  // Check for event at the new position
+  if (board[p.currentX][newY].hasEvent() &&
+      board[p.currentX][newY].getEventType() == "H") {
+    cout << "\n------------------------------------------" << endl;
+    cout << "     You tried to enter a blocked room..." << endl;
+    cout << "             That's too bad :(" << endl;
+    cout << "------------------------------------------" << endl;
+    return;
+  }
+
+  // Clear the player's current position
   board[p.currentX][p.currentY].setPlayerPresence(false);
 
-  // Move player left, wrap around if necessary
-  if (p.currentY - 1 < 0)
-    p.currentY = length - 1;
-  else
-    --p.currentY;
+  // Update the player's position
+  p.currentY = newY;
 
-  // Set new position
+  // Set the player's new position
   board[p.currentX][p.currentY].setPlayerPresence(true);
 }
 
 void Game::move_right() {
-  // Clear current position
+  int newY = p.currentY + 1 >= length ? 0 : p.currentY + 1;
+
+  // Check for event at the new position
+  if (board[p.currentX][newY].hasEvent() &&
+      board[p.currentX][newY].getEventType() == "H") {
+    cout << "\n------------------------------------------" << endl;
+    cout << "     You tried to enter a blocked room..." << endl;
+    cout << "             That's too bad :(" << endl;
+    cout << "------------------------------------------" << endl;
+    return;
+  }
+
+  // Clear the player's current position
   board[p.currentX][p.currentY].setPlayerPresence(false);
 
-  // Move player right, wrap around if necessary
-  if (p.currentY + 1 >= length)
-    p.currentY = 0;
-  else
-    ++p.currentY;
+  // Update the player's position
+  p.currentY = newY;
 
-  // Set new position
+  // Set the player's new position
   board[p.currentX][p.currentY].setPlayerPresence(true);
 }
 
@@ -311,12 +366,12 @@ pair<int, int> Game::giveRandomCoords() {
   randomCoord.first = rand() % length;
   randomCoord.second = rand() % width;
 
-  // Check if the randomly selected coordinate has an event
+  // check for empty space
   if (board[randomCoord.first][randomCoord.second].hasEvent())
-    // Recursively call the function again if the coordinate is not empty
+    // use recursion
     return giveRandomCoords();
   else
-    // If the coordinate is empty, return it
+    // if the coordinate is empty, return it
     return randomCoord;
 }
 
@@ -324,17 +379,18 @@ void Game::repositionWumpus() {
   pair<int, int> currentCoord;
   bool foundWumpus = false;
 
-  // Find current position of the Wumpus
+  // find current position of the Wumpus
   for (int i = 0; i < length; ++i) {
     for (int j = 0; j < width; ++j) {
       if (board[i][j].hasEvent() && board[i][j].getEventType() == "W") {
         currentCoord = make_pair(i, j);
-        delete board[i][j].getEvent(); // Delete the current Wumpus
-        board[i][j].setEvent(nullptr); // Set the current position to null
+        delete board[i][j].getEvent();
+        board[i][j].setEvent(nullptr);
         foundWumpus = true;
-        break; // Stop searching once Wumpus is found
+        break;
       }
     }
+
     if (foundWumpus)
       break;
   }
@@ -342,8 +398,7 @@ void Game::repositionWumpus() {
   if (foundWumpus) {
     pair<int, int> randomCoord = giveRandomCoords();
     Wumpus *wumpus = new Wumpus;
-    board[randomCoord.first][randomCoord.second].setEvent(
-        wumpus); // Place the Wumpus at the new location
+    board[randomCoord.first][randomCoord.second].setEvent(wumpus);
   }
 }
 
@@ -362,10 +417,14 @@ void Game::wumpus_move() {
     // make wumpus move to different random room that is empty
     repositionWumpus();
 
+    return;
+
   } else {
     cout << "\n----------------------------------------" << endl;
     cout << "Luckily, the wumpus did not move anywhere..." << endl;
     cout << "----------------------------------------" << endl;
+
+    return;
   }
 }
 
@@ -390,7 +449,7 @@ void Game::fire_north(int &arrowX, int &arrowY,
       cout << "KILLED THE WUMPUS! You win, Player." << endl;
       cout << "-----------------------------" << endl;
       p.killedWumpus = true; // Arrow hit the Wumpus
-      break;                 // Arrow has hit the target, no need to continue
+      break;
     }
   }
 
@@ -420,8 +479,8 @@ void Game::fire_west(int &arrowX, int &arrowY,
       cout << "\n-----------------------------" << endl;
       cout << "KILLED THE WUMPUS! You win, Player." << endl;
       cout << "-----------------------------" << endl;
-      p.killedWumpus = true; // Arrow hit the Wumpus
-      break;                 // Arrow has hit the target, no need to continue
+      p.killedWumpus = true;
+      break;
     }
   }
 
@@ -451,8 +510,8 @@ void Game::fire_east(int &arrowX, int &arrowY,
       cout << "\n-----------------------------" << endl;
       cout << "KILLED THE WUMPUS! You win, Player." << endl;
       cout << "-----------------------------" << endl;
-      p.killedWumpus = true; // Arrow hit the Wumpus
-      break;                 // Arrow has hit the target, no need to continue
+      p.killedWumpus = true;
+      break;
     }
   }
 
@@ -471,7 +530,7 @@ void Game::fire_south(int &arrowX, int &arrowY,
     ++arrowX;
 
     // boundary check
-    if (arrowY > length) {
+    if (arrowX >= length) {
       cout << "\nArrow hit a wall.\n" << endl;
       break;
     }
@@ -541,15 +600,19 @@ void Game::move(int c) {
   }
 
   switch (c) {
+  case 'W':
   case 'w':
     move_up();
     break;
+  case 'A':
   case 'a':
     move_left();
     break;
+  case 'S':
   case 's':
     move_down();
     break;
+  case 'D':
   case 'd':
     move_right();
     break;
@@ -583,24 +646,39 @@ void Game::inverted_move(int c) {
   }
 }
 
-char Game::get_input() {
-  // get action, move direction or firing an arrow
+void Game::blockRandom() {
 
+  pair<int, int> randomCoord = giveRandomCoords();
+
+  if (p.turnCount % 5 == 0) {
+    Hidden *newHidden = new Hidden;
+    board[randomCoord.first][randomCoord.second].setEvent(newHidden);
+  }
+}
+
+// get action, move direction or firing an arrow
+char Game::get_input() {
   char c;
 
-  // Note: error checking is needed!!
-  // Your code here:
-  cout << endl << endl << "Player move..." << endl << endl;
-  cout << "W-up" << endl;
-  cout << "A-left" << endl;
-  cout << "S-down" << endl;
-  cout << "D-right" << endl;
-  cout << "f-fire an arrow" << endl;
+  while (true) {
+    cout << endl << endl << "Player move..." << endl << endl;
+    cout << "W-up" << endl;
+    cout << "A-left" << endl;
+    cout << "S-down" << endl;
+    cout << "D-right" << endl;
+    cout << "f-fire an arrow" << endl;
 
-  cout << "Enter input: " << endl;
-  cin >> c;
-  cin.clear();
-  cin.ignore(100000, '\n');
+    cout << "Enter input: " << endl;
+    cin >> c;
+    cin.clear();
+    cin.ignore(100000, '\n');
+
+    if (c == 'W' || c == 'w' || c == 'A' || c == 'a' || c == 'S' || c == 's' ||
+        c == 'D' || c == 'd' || c == 'F' || c == 'f')
+      break;
+    else
+      cout << "\nInvalid input. Enter W, A, S, or D.\n" << endl;
+  }
 
   return c;
 }
@@ -631,15 +709,17 @@ void Game::checkPercepts(const vector<vector<Room>> &grid) {
 void Game::movement(const int &input) {
   if (!p.isConfused)
     move(input);
+
   else if (p.isConfused && p.invertedCounter > 0) {
     // invert movement
     --p.invertedCounter;
     inverted_move(input);
+
   } else if (p.invertedCounter == 0) {
     cout << "\n---------------------------" << endl;
     cout << "You are no longer confused!" << endl;
     cout << "Movement is back to normal!" << endl;
-    cout << "\n---------------------------" << endl;
+    cout << "---------------------------" << endl;
 
     p.isConfused = false;
     p.invertedCounter = 5;
@@ -667,9 +747,24 @@ void Game::play_game(int w, int l, bool d) {
     // 2. move player
     movement(input);
 
+    ++p.turnCount;
+    blockRandom();
+
     // 3. may or may not encounter events
     if (board[p.currentX][p.currentY].hasEvent())
       board[p.currentX][p.currentY].getEvent()->encounter(p);
+
+    if (board[p.currentX][p.currentY].hasEvent() &&
+        board[p.currentX][p.currentY].getEventType() == "G") {
+      delete board[p.currentX][p.currentY].getEvent();
+      board[p.currentX][p.currentY].setEvent(nullptr);
+    }
+
+    if (board[p.currentX][p.currentY].hasEvent() &&
+        board[p.currentX][p.currentY].getEventType() == "A") {
+      delete board[p.currentX][p.currentY].getEvent();
+      board[p.currentX][p.currentY].setEvent(nullptr);
+    }
   }
 
   return;
