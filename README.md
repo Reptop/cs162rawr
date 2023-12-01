@@ -1,4 +1,5 @@
-# cs162rawr
-repo containing all 162 projects; did extra credit for project 1, project 2, project 3, and project 4
+# What is this repo?
+This repo contains all my assignments for my CS162 class - taken during fall 2023; I did most extra credit.
 
-When I say I did extra-credit, I did all possible extra credit (not really anymore nvm :(
+# Why is it on github?
+For fun :)
