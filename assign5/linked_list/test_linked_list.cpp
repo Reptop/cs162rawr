@@ -1,3 +1,12 @@
+/******************************************************
+** Program: test_linked_list.cpp
+** Author: Your Name
+** Date: 12/10/2023
+** Description: Contains testing scripts for linked lists functions
+** Input: Raed Kabir
+** Output: Test cases for linked lists
+******************************************************/
+
 #include "linked_list.h"
 #include <iostream>
 
@@ -15,7 +24,6 @@ int main(int argc, char const *argv[]) {
   // Linked_List <int> l;
 
   cout << "\n\nList successfully created!!\n\n";
-  ;
 
   cout << "**********Test 1***********\n";
   cout << "Before adding nodes...\n";

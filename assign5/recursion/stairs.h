@@ -8,4 +8,4 @@
  * 	Returns: The number of ways to get to the top. See the
  *		examples in the assignment description for more info.
  */
- int ways_to_top(int n);
+int ways_to_top(int);
